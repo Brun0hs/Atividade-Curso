@@ -1,0 +1,9 @@
+/* Ajustes finos além do Bootstrap */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Toggles de dropdown da navbar são <a role="button"> sem href */
+.navbar .dropdown-toggle {
+  cursor: pointer;
+}
