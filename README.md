@@ -1,32 +1,44 @@
-# Novus Saber — versão JavaScript (full-stack Dockerizado)
+# Novus Saber — versão JavaScript (modular)
 
-Plataforma de cursos com o **mesmo escopo e telas da versão React** (`atividade-curso-react`):
-autenticação, catálogo de cursos e CRUDs. O frontend é **JavaScript puro (ES Modules)**,
-servido pelo **Vite**, e a aplicação roda em containers orquestrados por **Docker Compose**,
-seguindo a mesma arquitetura do projeto de referência (`projeto-web`).
+Plataforma de cursos em **JavaScript puro (ES Modules)**, com o **mesmo escopo e telas
+da versão React** (`atividade-curso-react`): autenticação, catálogo de cursos e CRUDs.
+O antigo `script.js` monolítico foi quebrado em módulos com **separação de
+responsabilidades**, espelhando a arquitetura do projeto React.
 
-## Arquitetura (Docker Compose)
-
-| Serviço    | Imagem / Build      | Porta (host) | Função                                   |
-|------------|---------------------|--------------|------------------------------------------|
-| `nginx`    | `./nginx`           | **8080**     | Proxy reverso: `/` → frontend, `/api` → backend |
-| `frontend` | `./frontend` (Vite) | 5173         | App em JavaScript puro (ES Modules)      |
-| `backend`  | `./backend` (NestJS)| 3000         | API NestJS (recebe `DATABASE_URL`)       |
-| `postgres` | `postgres:alpine`   | 5532         | Banco de dados PostgreSQL                |
-| `pgadmin`  | `dpage/pgadmin4`    | 5550         | UI de administração do Postgres          |
+## Estrutura
 
 ```
 Atividade-Curso/
-├── docker-compose.yml      # orquestra os 5 serviços
-├── .env.example            # variáveis de ambiente (copie para .env)
-├── frontend/               # app JS puro + Vite + Dockerfile
-│   ├── index.html
-│   ├── css/style.css
-│   └── js/                 # main, core, models, services, components, pages
-├── backend/                # API NestJS + Dockerfile
-│   └── src/                # main.ts, app.module/controller/service.ts
-└── nginx/                  # proxy reverso (Dockerfile + nginx.conf)
+├── index.html            # shell (só os containers #nav e #app)
+├── css/style.css
+└── js/
+    ├── main.js           # ponto de entrada (semeia o banco + inicia rotas)
+    ├── core/
+    │   ├── dom.js        # helper para criar elementos (estilo JSX)
+    │   ├── storage.js    # "banco" em localStorage + seed
+    │   ├── auth.js       # sessão (login/cadastro/logout)
+    │   └── router.js     # roteador por hash + rota privada
+    ├── models/
+    │   └── validators.js # validações (espelham os schemas Zod)
+    ├── services/
+    │   ├── base.service.js  # CRUD genérico sobre o localStorage
+    │   └── index.js         # um service por entidade
+    ├── components/
+    │   ├── index.js      # Button, Input, Select, Tabela
+    │   └── nav.js        # navbar dinâmica
+    └── pages/
+        ├── crudPage.js   # fábrica de página CRUD (Form + Tabela)
+        ├── home.page.js  · login.page.js · cadastro.page.js
+        ├── categoria.page.js · curso.page.js · trilha.page.js
+        └── modulo.page.js · aula.page.js · usuario.page.js
 ```
+
+## Telas (mesmas da versão React)
+
+- **Home**: boas-vindas (deslogado) ou catálogo de cursos com filtro (logado)
+- **Login** e **Cadastro**
+- **CRUDs** (formulário + tabela): Categorias, Cursos, Trilhas (+ vincular curso),
+  Módulos, Aulas e Usuários
 
 ## Como rodar
 
